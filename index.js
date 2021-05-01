@@ -1,37 +1,103 @@
-const inquirer = require('inquirer');
-const fs = require('fs');
-const util = require('util');
+const inquirer = require("inquirer");
+const fs = require("fs");
+const util = require("util");
 
-const Manager = require('./lib/Manager');
-const Engineer = require('./lib/Engineer');
-const Intern = require('./lib/Intern');
+const Employee = require("./lib/Employee");
+const Manager = require("./lib/Manager");
+const Engineer = require("./lib/Engineer");
+const Intern = require("./lib/Intern");
+
+const teamMembers = [];
 
 const writeFileAsync = util.promisify(fs.writeFile);
 
-const questions = [
-    {
-        type: 'list',
-        name: 'jobType',
-        message: 'Which role card would you like to build?',
-        choices: ["Manager", "Engineer", "Intern"]
+const managerQuestion = [
+  {
+    type: "input",
+    name: "officeNumber",
+    message: "What is the office number?",
+  },
+];
+
+const engineerQuestion = [
+  {
+    type: "input",
+    name: "Github",
+    message: "What is your employee's GitHub username?",
+  },
+];
+
+const internQuestion = [
+  {
+    type: "input",
+    name: "school",
+    message: "What is the name of your intern's school?",
+  },
+];
+
+const promptUser = () => {
+  return inquirer
+    .prompt([
+      {
+        type: "list",
+        name: "jobType",
+        message: "Which role card would you like to build?",
+        choices: ["Manager", "Engineer", "Intern"],
       },
       {
-        type: 'input',
-        name: 'employeeName',
+        type: "input",
+        name: "employeeName",
         message: "What is your employee's name?",
       },
       {
-        type: 'input',
-        name: 'employeeID',
+        type: "input",
+        name: "employeeID",
         message: "What is your employee's ID?",
       },
       {
-        type: 'input',
-        name: 'employeeEmail',
+        type: "input",
+        name: "employeeEmail",
         message: "What is your employee's email address?",
       },
-];
+    ])
 
+    .then((userInput) => {
+      if (userInput.jobType === "Manager") {
+        return inquirer.prompt(managerQuestion).then((userInput2) => {
+          const ManagerDude = new Manager(
+            userInput.employeeName,
+            userInput.employeeID,
+            userInput.employeeEmail,
+            userInput2.officeNumber
+          );
+          teamMembers.push(ManagerDude);
+        });
+      }
+      if (userInput.jobType === "Engineer") {
+        return inquirer.prompt(engineerQuestion).then((userInput2) => {
+          const EngineerDude = new Engineer(
+            userInput.employeeName,
+            userInput.employeeID,
+            userInput.employeeEmail,
+            userInput2.Github
+          );
+          teamMembers.push(EngineerDude);
+        });
+      }
+      if (userInput.jobType === "Intern") {
+        return inquirer.prompt(internQuestion).then((userInput2) => {
+          const InternDude = new Intern(
+            userInput.employeeName,
+            userInput.employeeID,
+            userInput.employeeEmail,
+            userInput2.school
+          );
+          teamMembers.push(InternDude);
+        });
+      }
+      
+    });
+};
 
 // let generatehtmlPage = teamObj => {
 //     console.log('team object', teamObj)
@@ -59,6 +125,7 @@ const questions = [
 //         }
 //     }
 
+///move to src folder
 const generateHTML = (userInput) =>
   `<!DOCTYPE html>
   <html lang="en">
@@ -89,24 +156,23 @@ const generateHTML = (userInput) =>
   </body>
   </html>`;
 
-
-const promptUser = () => {
-    return inquirer.prompt(questions)
-}
-
 // Function to write README file
-const writeToFile = (userInput) => {
-    fs.writeFile('README.md', userInput, (error) =>
-    error ? console.log('Error!') : console.log('Success!'));
-}
+const writeToFile = (userInput, userInput2) => {
+  fs.writeFile("./dist/employeeRoster.html", userInput, userInput2, (error) =>
+    error ? console.log("Error!") : console.log("Success!")
+  );
+};
 
 // Function to initialize app
 const init = () => {
-    promptUser()
-      .then((userInput) => writeFileAsync('employeeRoster.html', generateHTML(userInput)))
-      .then(() => console.log('Successfully wrote to employeeRoster.html!!!'))
-      .catch((err) => console.error(err));
-  };
+  promptUser()
+    .then((userInput) => {
+      console.log(teamMembers);
+      writeFileAsync("./dist/employeeRoster.html", generateHTML(userInput));
+    })
+    .then(() => console.log("Successfully wrote to employeeRoster.html!!!"))
+    .catch((err) => console.error(err));
+};
 
 // Function call to initialize app
 init();
