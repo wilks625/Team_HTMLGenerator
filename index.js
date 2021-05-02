@@ -34,7 +34,7 @@ const internQuestion = [
 ];
 // prompts user if they would like to add another employee
 const promptAnotherEmployee = () => {
-console.log("hey, im here!")
+// console.log("hey, im here!")
   inquirer
     .prompt([
       {
@@ -140,12 +140,14 @@ let generateHTMLCard = (teamObject) => {
       teamObject[i].officeNumber || teamObject[i].github || teamObject[i].school;
     let keys = Object.keys(teamObject[i]);
     let lastKey = keys[3];
-    let finalOption = lastKey + ":" + finalPrompt;
+    let finalOption = lastKey + ": " + finalPrompt;
 
     if (lastKey === undefined) {
       finalOption = "";
     } else if (lastKey === "github") {
-      finalOption = `GitHub : <a href = 'https://www.github.com/${teamObject[i].github}'> ${teamObject[i].github}</a>`;
+      // finalOption = `GitHub : <a href = 'https://www.github.com/${teamObject[i].github}'> ${teamObject[i].github}</a>`;
+      finalOption = `GitHub : <a value="Open Window"
+      onclick="window.open('https://github.com/${teamObject[i].github}')">${teamObject[i].github}</a>`
       console.log(finalOption);
     } else {
       console.log(finalOption);
@@ -161,7 +163,7 @@ let generateHTMLCard = (teamObject) => {
              </div> 
               <ul class="list-group">
                 <li class="list-group-item">ID: ${id}</li>
-                <li class="list-group-item">Email: ${email}</li>
+                <li class="list-group-item">Email: <a href="mailto:${email}">${email}</a></li>
                 <li class="list-group-item">${finalOption} </li>
               </ul>
           </div>
