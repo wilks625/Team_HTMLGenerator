@@ -7,6 +7,7 @@ const Manager = require("./lib/Manager");
 const Engineer = require("./lib/Engineer");
 const Intern = require("./lib/Intern");
 
+// array for employee information from user input
 const teamMembers = [];
 
 const writeFileAsync = util.promisify(fs.writeFile);
@@ -32,9 +33,9 @@ const internQuestion = [
     message: "What is the name of your intern's school?",
   },
 ];
-// prompts user if they would like to add another employee
+// prompts user if they would like to add an additional employee, if no, it will generate html
 const promptAnotherEmployee = () => {
-// console.log("hey, im here!")
+  // console.log("hey, im here!")
   inquirer
     .prompt([
       {
@@ -47,8 +48,7 @@ const promptAnotherEmployee = () => {
       if (userInput3.addEmployee === true) {
         console.log("prompting for additional user");
         promptUser();
-      }
-      else {
+      } else {
         // console.log("team", teamMembers);
         // generateHTMLPage();
         const htmlCard = generateHTMLCard(teamMembers);
@@ -57,7 +57,7 @@ const promptAnotherEmployee = () => {
       }
     });
 };
-// questions for user to answer
+// questions to gather information about employees to create HTML cards
 const promptUser = () => {
   inquirer
     .prompt([
@@ -129,7 +129,7 @@ const promptUser = () => {
     });
 };
 
-
+// for loop to allow array to include office number, github username, or school based on whether the employee was a manager, engineer, or student
 let generateHTMLCard = (teamObject) => {
   console.log("team object", teamObject);
 
@@ -137,7 +137,9 @@ let generateHTMLCard = (teamObject) => {
 
   for (let i = 0; i < teamObject.length; i++) {
     let finalPrompt =
-      teamObject[i].officeNumber || teamObject[i].github || teamObject[i].school;
+      teamObject[i].officeNumber ||
+      teamObject[i].github ||
+      teamObject[i].school;
     let keys = Object.keys(teamObject[i]);
     let lastKey = keys[3];
     let finalOption = lastKey + ": " + finalPrompt;
@@ -145,9 +147,8 @@ let generateHTMLCard = (teamObject) => {
     if (lastKey === undefined) {
       finalOption = "";
     } else if (lastKey === "github") {
-      // finalOption = `GitHub : <a href = 'https://www.github.com/${teamObject[i].github}'> ${teamObject[i].github}</a>`;
       finalOption = `GitHub : <a value="Open Window"
-      onclick="window.open('https://github.com/${teamObject[i].github}')">${teamObject[i].github}</a>`
+      onclick="window.open('https://github.com/${teamObject[i].github}')">${teamObject[i].github}</a>`;
       console.log(finalOption);
     } else {
       console.log(finalOption);
@@ -155,9 +156,10 @@ let generateHTMLCard = (teamObject) => {
     let { name, email, id } = teamObject[i];
     console.log(name, email, id, finalOption);
     newCard += `
+    <div id="card-container">
          <div class="card" style="width: 18rem;">
           <div class="container">
-            <div style="background-color:rgb(66, 57, 240); color: white;">
+            <div style="background-color:rgb(66, 57, 240); color: white; text-align: center;">
                <h4 class="display-6">${name}</h4>
                <h4>${teamObject[i].constructor.name}</h4>
              </div> 
@@ -168,6 +170,7 @@ let generateHTMLCard = (teamObject) => {
               </ul>
           </div>
         </div>
+     </div>  
     `;
   }
 
@@ -185,14 +188,14 @@ const generateHTMLPage = (htmlCard) =>
     <title>Document</title>
   </head>
   <body>
-      <header style="background-color:red; color: white; text-align: center; font-size: large;">My Team</header>
+      <header style="background-color:red; color: white; text-align: center; font-size: 40px;">My Team</header>
   
   ${htmlCard}
   
   </body>
   </html>`;
 
-// Function to write README file
+// Function to write HTML file
 const writeToFile = (userInput) => {
   fs.writeFile("./dist/employeeRoster.html", userInput, (error) =>
     error ? console.log("Error!") : console.log("Success!")
@@ -203,13 +206,6 @@ const writeToFile = (userInput) => {
 const init = () => {
   promptUser();
 };
-
-/*
-promptUser - get user info
-ask if they wanna add another user?
-  - yes: promptUser
-  - no: save
-*/
 
 // Function call to initialize app
 init();
