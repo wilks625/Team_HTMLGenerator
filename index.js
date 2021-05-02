@@ -14,14 +14,14 @@ const writeFileAsync = util.promisify(fs.writeFile);
 const managerQuestion = [
   {
     type: "input",
-    name: "OfficeNumber",
+    name: "officeNumber",
     message: "What is the office number?",
   },
 ];
 const engineerQuestion = [
   {
     type: "input",
-    name: "GitHubUser",
+    name: "github",
     message: "What is your employee's GitHub username?",
   },
 ];
@@ -32,6 +32,31 @@ const internQuestion = [
     message: "What is the name of your intern's school?",
   },
 ];
+
+const promptAnotherEmployee = () => {
+console.log("hey, im here!")
+  return inquirer
+    .prompt([
+      {
+        type: "confirm",
+        name: "addEmployee",
+        message: "Would you like to add another emplyoyee?",
+      },
+    ])
+    .then((userInput3) => {
+      if (userInput3.addEmployee === true) {
+        console.log("prompting for additional user");
+        promptUser(teamMembers).then();
+      }
+      else {
+        // console.log("team", teamMembers);
+        // generateHTMLPage();
+        const htmlCard = generateHTMLCard(teamMembers);
+        const htmlPage = generateHTMLPage(htmlCard);
+        writeFileAsync("./dist/employeeRoster.html", htmlPage);
+      }
+    });
+};
 
 const promptUser = () => {
   return inquirer
@@ -58,7 +83,6 @@ const promptUser = () => {
         message: "What is your employee's email address?",
       },
     ])
-
     .then((userInput) => {
       if (userInput.role === "Manager") {
         return inquirer.prompt(managerQuestion).then((userInput2) => {
@@ -69,22 +93,20 @@ const promptUser = () => {
             userInput2.officeNumber
           );
           teamMembers.push(ManagerDude);
-          addEmployee()
+          // return promptAnotherEmployee();
         });
-      }
-      if (userInput.role === "Engineer") {
+      } else if (userInput.role === "Engineer") {
         return inquirer.prompt(engineerQuestion).then((userInput2) => {
           const EngineerDude = new Engineer(
             userInput.name,
             userInput.id,
             userInput.email,
-            userInput2.GitHubUser
+            userInput2.github
           );
           teamMembers.push(EngineerDude);
-          addEmployee()
+          // return promptAnotherEmployee();
         });
-      }
-      if (userInput.role === "Intern") {
+      } else if (userInput.role === "Intern") {
         return inquirer.prompt(internQuestion).then((userInput2) => {
           const InternDude = new Intern(
             userInput.name,
@@ -93,80 +115,93 @@ const promptUser = () => {
             userInput2.schoolName
           );
           teamMembers.push(InternDude);
-          addEmployee()
+          // return promptAnotherEmployee();
         });
+      } else {
+        const employee = new Employee(
+          userInput.name,
+          userInput.id,
+          userInput.email,
+          userInput.role
+        );
+        teamMembers.push(employee);
+        // return promptAnotherEmployee();
       }
-      const addEmployee = () => {
-        return inquirer.prompt([
-          {
-            type: "confirm",
-            name: "addEmployee",
-            message: "Would you like to add another employee?",
-          },
-        ])
-        .then(userInput3 => {
-          if(userInput3.addEmployee === true) {
-            promptUser(teamMembers);
-          } else {
-            console.log('team', teamMembers)
-            generateHTMLPage()
-          }
-          
-        }) 
-      };
+      // const addEmployee = () => {
+      //   return inquirer
+      //     .prompt([
+      //       {
+      //         type: "confirm",
+      //         name: "addEmployee",
+      //         message: "Would you like to add another emplyoyee?",
+      //       },
+      //     ])
+      //     .then((userInput3) => {
+      //       if (userInput3.addEmployee === true) {
+      //         promptUser(teamMembers);
+      //       } else {
+      //         console.log("team", teamMembers);
+      //         generateHTMLPage();
+      //       }
+      //     });
+      // };
     });
 };
 
-let generateHTMLPage = teamObject => {
-    console.log('team object', teamObject)
 
-   // set card to empty
-    let htmlCard = ""
+let generateHTMLCard = (teamObject) => {
+  console.log("team object", teamObject);
 
-    //loop over array of objects
+  let newCard = "";
 
-    for(let i = 0; i < teamObject.length; i++){
-        let finalPrompt = teamObject[i].office || teamObject[i].gitHub || teamObject[i].school;
-        let keys = Object.keys(teamObject[i]);
-        let lastKey = keys[4];
-        let finalOption = lastKey + ":" + finalPrompt
+  for (let i = 0; i < teamObject.length; i++) {
+    let finalPrompt =
+      teamObject[i].officeNumber || teamObject[i].github || teamObject[i].school;
+    let keys = Object.keys(teamObject[i]);
+    /*
+      Manager {
+        name: 'steve',
+        id: '11',
+        email: 'ssesdf1232',
+        officeNumber: '123'
+      }
+      ['name', 'id', 'email', 'officeNumber']
+      keys[1]
+    */
+    let lastKey = keys[3];
+    let finalOption = lastKey + ":" + finalPrompt;
 
-        if (lastKey === undefined){
-            finalOption = "";
-
-        } else if (lastKey === 'gitHub'){
-          finalOption = (`GitHub : <a href = 'https://www.github.com/${teamObj[i].gitHub}'> ${teamObj[i].gitHub}</a>`)
-            console.log(finalOption)
-        }
-        else {
-            console.log(finalOption)
-            
-        }
+    if (lastKey === undefined) {
+      finalOption = "";
+    } else if (lastKey === "github") {
+      finalOption = `GitHub : <a href = 'https://www.github.com/${teamObject[i].github}'> ${teamObject[i].github}</a>`;
+      console.log(finalOption);
+    } else {
+      console.log(finalOption);
     }
+    let { name, email, id } = teamObject[i];
+    console.log(name, email, id, finalOption);
+    newCard += `
+         <div class="card" style="width: 18rem;">
+          <div class="container">
+            <div style="background-color:rgb(66, 57, 240); color: white;">
+               <h4 class="display-6">${name}</h4>
+               <h4>${teamObject[i].constructor.name}</h4>
+             </div> 
+              <ul class="list-group">
+                <li class="list-group-item">ID: ${id}</li>
+                <li class="list-group-item">Email: ${email}</li>
+                <li class="list-group-item">${finalOption} </li>
+              </ul>
+          </div>
+        </div>
+    `;
   }
-///move to src folder
-let newCard = ""
 
-let {name, email, id, role} = teamObject[i]
-htmlCard+=
-`
-<div class="card" style="width: 18rem;">
-    <div class="container">
-      <div style="background-color:rgb(66, 57, 240); color: white;">
-          <h4 class="display-6">${userInput2.officeNumber}</h4>
-          <h4>${userInput2.officeNumber}.</h4>
-      </div> 
-      <ul class="list-group">
-        <li class="list-group-item">ID: ${userInput2.officeNumber}</li>
-        <li class="list-group-item">Email: ${userInput2.officeNumber}</li>
-        <li class="list-group-item">Email: ${userInput2.officeNumber}</li>
-      </ul>
-    </div>
-  </div>
+  return newCard;
+};
 
-`
-
-const generateHTML = (userInput2) =>
+const generateHTMLPage = (htmlCard) =>
   `<!DOCTYPE html>
   <html lang="en">
   <head>
@@ -179,7 +214,7 @@ const generateHTML = (userInput2) =>
   <body>
       <header style="background-color:red; color: white; text-align: center; font-size: large;">My Team</header>
   
-  
+  ${htmlCard}
   
   </body>
   </html>`;
@@ -194,9 +229,8 @@ const writeToFile = (userInput) => {
 // Function to initialize app
 const init = () => {
   promptUser()
-    .then((userInput2) => {
-      console.log(teamMembers);
-      // writeFileAsync("./dist/employeeRoster.html", generateHTML(userInput2));
+    .then(() => {
+      promptAnotherEmployee().then()
     })
     .then(() => console.log("Successfully wrote to employeeRoster.html!!!"))
     .catch((err) => console.error(err));
