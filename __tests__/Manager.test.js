@@ -3,7 +3,7 @@ const Manager = require("../lib/Manager");
 test("Can set office number via constructor", () => {
   const testValue = "officeNumber";
   const e = new Manager("Foo", 1, "test@test.com", testValue);
-  expect(e.github).toBe(testValue);
+  expect(e.officeNumber).toBe(testValue);
 });
 
 test("getRole() should return \"Intern\"", () => {

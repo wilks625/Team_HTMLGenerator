@@ -32,10 +32,10 @@ const internQuestion = [
     message: "What is the name of your intern's school?",
   },
 ];
-
+// prompts user if they would like to add another employee
 const promptAnotherEmployee = () => {
 console.log("hey, im here!")
-  return inquirer
+  inquirer
     .prompt([
       {
         type: "confirm",
@@ -46,7 +46,7 @@ console.log("hey, im here!")
     .then((userInput3) => {
       if (userInput3.addEmployee === true) {
         console.log("prompting for additional user");
-        promptUser(teamMembers).then();
+        promptUser();
       }
       else {
         // console.log("team", teamMembers);
@@ -57,9 +57,9 @@ console.log("hey, im here!")
       }
     });
 };
-
+// questions for user to answer
 const promptUser = () => {
-  return inquirer
+  inquirer
     .prompt([
       {
         type: "list",
@@ -85,7 +85,7 @@ const promptUser = () => {
     ])
     .then((userInput) => {
       if (userInput.role === "Manager") {
-        return inquirer.prompt(managerQuestion).then((userInput2) => {
+        inquirer.prompt(managerQuestion).then((userInput2) => {
           const ManagerDude = new Manager(
             userInput.name,
             userInput.id,
@@ -93,10 +93,10 @@ const promptUser = () => {
             userInput2.officeNumber
           );
           teamMembers.push(ManagerDude);
-          // return promptAnotherEmployee();
+          promptAnotherEmployee();
         });
       } else if (userInput.role === "Engineer") {
-        return inquirer.prompt(engineerQuestion).then((userInput2) => {
+        inquirer.prompt(engineerQuestion).then((userInput2) => {
           const EngineerDude = new Engineer(
             userInput.name,
             userInput.id,
@@ -104,10 +104,10 @@ const promptUser = () => {
             userInput2.github
           );
           teamMembers.push(EngineerDude);
-          // return promptAnotherEmployee();
+          promptAnotherEmployee();
         });
       } else if (userInput.role === "Intern") {
-        return inquirer.prompt(internQuestion).then((userInput2) => {
+        inquirer.prompt(internQuestion).then((userInput2) => {
           const InternDude = new Intern(
             userInput.name,
             userInput.id,
@@ -115,7 +115,7 @@ const promptUser = () => {
             userInput2.schoolName
           );
           teamMembers.push(InternDude);
-          // return promptAnotherEmployee();
+          promptAnotherEmployee();
         });
       } else {
         const employee = new Employee(
@@ -125,26 +125,7 @@ const promptUser = () => {
           userInput.role
         );
         teamMembers.push(employee);
-        // return promptAnotherEmployee();
       }
-      // const addEmployee = () => {
-      //   return inquirer
-      //     .prompt([
-      //       {
-      //         type: "confirm",
-      //         name: "addEmployee",
-      //         message: "Would you like to add another emplyoyee?",
-      //       },
-      //     ])
-      //     .then((userInput3) => {
-      //       if (userInput3.addEmployee === true) {
-      //         promptUser(teamMembers);
-      //       } else {
-      //         console.log("team", teamMembers);
-      //         generateHTMLPage();
-      //       }
-      //     });
-      // };
     });
 };
 
@@ -158,16 +139,6 @@ let generateHTMLCard = (teamObject) => {
     let finalPrompt =
       teamObject[i].officeNumber || teamObject[i].github || teamObject[i].school;
     let keys = Object.keys(teamObject[i]);
-    /*
-      Manager {
-        name: 'steve',
-        id: '11',
-        email: 'ssesdf1232',
-        officeNumber: '123'
-      }
-      ['name', 'id', 'email', 'officeNumber']
-      keys[1]
-    */
     let lastKey = keys[3];
     let finalOption = lastKey + ":" + finalPrompt;
 
@@ -228,13 +199,15 @@ const writeToFile = (userInput) => {
 
 // Function to initialize app
 const init = () => {
-  promptUser()
-    .then(() => {
-      promptAnotherEmployee().then()
-    })
-    .then(() => console.log("Successfully wrote to employeeRoster.html!!!"))
-    .catch((err) => console.error(err));
+  promptUser();
 };
+
+/*
+promptUser - get user info
+ask if they wanna add another user?
+  - yes: promptUser
+  - no: save
+*/
 
 // Function call to initialize app
 init();
