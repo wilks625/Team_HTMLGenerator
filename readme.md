@@ -2,6 +2,8 @@
 
 This application is a Node.js command-line application that takes in information about employees on a software engineering team, then generates an HTML webpage that displays summaries for each person. Jest tests were created and used to make code maintainable.
 
+![Screen Shot 2021-05-02 at 1 28 01 AM](https://user-images.githubusercontent.com/76915726/116803510-444c8e80-aae6-11eb-9246-21d76895ec66.png)
+
 Below is a video that demonstrates the application's functionality:
 https://drive.google.com/file/d/1fLwsfM6rl4Y_IpR4kQ3KhAGcZcBGtS60/view
 
